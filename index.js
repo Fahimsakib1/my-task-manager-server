@@ -79,12 +79,63 @@ async function run(){
             }
             const result = await tasksCollection.updateOne(filter, updatedTask, option)
             res.send(result);
+        })
 
+        //get a specific task by Task ID for complete Task Route
+        app.get('/completeTask/:id', async(req, res) => {
+            const id = req.params.id;
+            const query = {_id: ObjectId(id)};
+            const result = await tasksCollection.findOne(query);
+            res.send(result);
+        })
+
+        //update the status of the completed button when The Complete task Button is clicked
+        app.put('/completeTask/:id', async(req, res) => {
+            const id = req.params.id;
+            const filter = {_id: ObjectId(id)};
+            const option = { upsert: true };
+            const updatedTask = {
+                $set: {
+                    isCompleted: true,
+                }
+            }
+            const result = await tasksCollection.updateOne(filter, updatedTask, option)
+            res.send(result);
+        })
+
+        //get only the complete Tasks for the display Completed Task Route
+        app.get('/displayCompletedTasks', async(req, res) => {
+            const query = {isCompleted: true};
+            const result = await tasksCollection.find(query).toArray();
+            res.send(result);
+        })
+
+
+        //get a specific task by Task ID for complete Task Route
+        app.get('/notCompleteTask/:id', async(req, res) => {
+            const id = req.params.id;
+            const query = {_id: ObjectId(id)};
+            const result = await tasksCollection.findOne(query);
+            res.send(result);
+        })
+
+        //update the status of the completed button when Not Complete Button is Clicked
+        app.put('/notCompleteTask/:id', async(req, res) => {
+            const id = req.params.id;
+            const filter = {_id: ObjectId(id)};
+            const option = { upsert: true };
+            const updatedTask = {
+                $set: {
+                    isCompleted: false,
+                }
+            }
+            const result = await tasksCollection.updateOne(filter, updatedTask, option)
+            res.send(result);
         })
 
 
     }
-    
+
     finally {
 
     }

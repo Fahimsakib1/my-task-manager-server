@@ -1,4 +1,4 @@
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const express = require('express');
 const app = express();
 const cors = require('cors');
@@ -34,19 +34,57 @@ async function run(){
             console.log("Task Info", taskInfo)
             const result = await tasksCollection.insertOne(taskInfo);
             res.send(result);
-            
         })
 
         //get the tasks by user email
         app.get('/tasks', async(req, res) => {
-
             const email = req.query.email;
             const query = {userEmail: email};
             const result = await tasksCollection.find(query).toArray();
             res.send(result);
-            
         })
+
+        //delete a task based on task ID
+        app.delete('/deleteTask/:id', async(req, res) => {
+            const id = req.params.id;
+            const query = {_id: ObjectId(id)};
+            const result = await tasksCollection.deleteOne(query);
+            res.send(result);
+        })
+
+        //get a specific task by Task ID
+        app.get('/task/:id', async(req, res) => {
+            const id = req.params.id;
+            const query = {_id: ObjectId(id)};
+            const result = await tasksCollection.findOne(query);
+            res.send(result);
+        })
+
+        //update task info
+        app.put('/task/:id', async(req, res) => {
+            const id = req.params.id;
+            console.log("Task ID For Update: ", id);
+            const updatedTaskInfo = req.body;
+            console.log("Updated Task Info", updatedTaskInfo);
+
+            const filter = {_id: ObjectId(id)};
+            const option = { upsert: true };
+            const updatedTask = {
+                $set: {
+                    taskName: updatedTaskInfo.taskName,
+                    taskDescription: updatedTaskInfo.taskDescription,
+                    taskPostedDate: updatedTaskInfo.taskPostedDate,
+                    taskImage: updatedTaskInfo.taskImage
+                }
+            }
+            const result = await tasksCollection.updateOne(filter, updatedTask, option)
+            res.send(result);
+
+        })
+
+
     }
+    
     finally {
 
     }

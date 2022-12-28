@@ -24,12 +24,13 @@ console.log("Task Manager URI", uri)
 
 
 
-async function run(){
-    try{
+async function run() {
+    try {
         const tasksCollection = client.db('my-task-manager').collection('addedTasks');
+        const commentsCollection = client.db('my-task-manager').collection('addedComments');
 
         //post the tasks to database
-        app.post('/addedTasks', async(req, res) => {
+        app.post('/addedTasks', async (req, res) => {
             const taskInfo = req.body;
             console.log("Task Info", taskInfo)
             const result = await tasksCollection.insertOne(taskInfo);
@@ -37,37 +38,37 @@ async function run(){
         })
 
         //get the tasks by user email
-        app.get('/tasks', async(req, res) => {
+        app.get('/tasks', async (req, res) => {
             const email = req.query.email;
-            const query = {userEmail: email};
+            const query = { userEmail: email };
             const result = await tasksCollection.find(query).toArray();
             res.send(result);
         })
 
         //delete a task based on task ID
-        app.delete('/deleteTask/:id', async(req, res) => {
+        app.delete('/deleteTask/:id', async (req, res) => {
             const id = req.params.id;
-            const query = {_id: ObjectId(id)};
+            const query = { _id: ObjectId(id) };
             const result = await tasksCollection.deleteOne(query);
             res.send(result);
         })
 
         //get a specific task by Task ID
-        app.get('/task/:id', async(req, res) => {
+        app.get('/task/:id', async (req, res) => {
             const id = req.params.id;
-            const query = {_id: ObjectId(id)};
+            const query = { _id: ObjectId(id) };
             const result = await tasksCollection.findOne(query);
             res.send(result);
         })
 
         //update task info
-        app.put('/task/:id', async(req, res) => {
+        app.put('/task/:id', async (req, res) => {
             const id = req.params.id;
             console.log("Task ID For Update: ", id);
             const updatedTaskInfo = req.body;
             console.log("Updated Task Info", updatedTaskInfo);
 
-            const filter = {_id: ObjectId(id)};
+            const filter = { _id: ObjectId(id) };
             const option = { upsert: true };
             const updatedTask = {
                 $set: {
@@ -82,17 +83,17 @@ async function run(){
         })
 
         //get a specific task by Task ID for complete Task Route
-        app.get('/completeTask/:id', async(req, res) => {
+        app.get('/completeTask/:id', async (req, res) => {
             const id = req.params.id;
-            const query = {_id: ObjectId(id)};
+            const query = { _id: ObjectId(id) };
             const result = await tasksCollection.findOne(query);
             res.send(result);
         })
 
         //update the status of the completed button when The Complete task Button is clicked
-        app.put('/completeTask/:id', async(req, res) => {
+        app.put('/completeTask/:id', async (req, res) => {
             const id = req.params.id;
-            const filter = {_id: ObjectId(id)};
+            const filter = { _id: ObjectId(id) };
             const option = { upsert: true };
             const updatedTask = {
                 $set: {
@@ -104,25 +105,24 @@ async function run(){
         })
 
         //get only the complete Tasks for the display Completed Task Route
-        app.get('/displayCompletedTasks', async(req, res) => {
-            const query = {isCompleted: true};
+        app.get('/displayCompletedTasks', async (req, res) => {
+            const query = { isCompleted: true };
             const result = await tasksCollection.find(query).toArray();
             res.send(result);
         })
 
-
         //get a specific task by Task ID for complete Task Route
-        app.get('/notCompleteTask/:id', async(req, res) => {
+        app.get('/notCompleteTask/:id', async (req, res) => {
             const id = req.params.id;
-            const query = {_id: ObjectId(id)};
+            const query = { _id: ObjectId(id) };
             const result = await tasksCollection.findOne(query);
             res.send(result);
         })
 
         //update the status of the completed button when Not Complete Button is Clicked
-        app.put('/notCompleteTask/:id', async(req, res) => {
+        app.put('/notCompleteTask/:id', async (req, res) => {
             const id = req.params.id;
-            const filter = {_id: ObjectId(id)};
+            const filter = { _id: ObjectId(id) };
             const option = { upsert: true };
             const updatedTask = {
                 $set: {
@@ -133,6 +133,20 @@ async function run(){
             res.send(result);
         })
 
+        //update the status of the completed button when Not Complete Button is Clicked
+        app.post('/addComment', async (req, res) => {
+            const commentInfo = req.body;
+            const result = await commentsCollection.insertOne(commentInfo);
+            res.send(result);
+        })
+
+         //get all the comment based on tasks main ID (filtered by the ID When the task was added)
+        app.get('/comments/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { taskMainID: id };
+            const result = await commentsCollection.find(query).toArray();
+            res.send(result);
+        })
 
     }
 

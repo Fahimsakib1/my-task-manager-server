@@ -141,11 +141,27 @@ async function run() {
             res.send(result);
         })
 
-         //get all the comment based on tasks main ID (filtered by the ID When the task was added)
+        //get all the comment based on tasks main ID (filtered by the ID When the task was added)
         app.get('/comments/:id', async (req, res) => {
             const id = req.params.id;
             const query = { taskMainID: id };
             const result = await commentsCollection.find(query).toArray();
+            res.send(result);
+        })
+
+        //get the task Image on the comment page comment page
+        app.get('/commentImage/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = {_id: ObjectId(id)};
+            const result = await tasksCollection.findOne(query);
+            res.send(result);
+        })
+
+        //delete a comment based on comment ID
+        app.delete('/deleteComment/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await commentsCollection.deleteOne(query);
             res.send(result);
         })
 

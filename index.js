@@ -106,7 +106,8 @@ async function run() {
 
         //get only the complete Tasks for the display Completed Task Route
         app.get('/displayCompletedTasks', async (req, res) => {
-            const query = { isCompleted: true };
+            const email = req.query.email;
+            const query = { isCompleted: true, userEmail: email };
             const result = await tasksCollection.find(query).toArray();
             res.send(result);
         })
